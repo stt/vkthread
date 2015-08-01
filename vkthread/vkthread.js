@@ -59,7 +59,9 @@
 
   function _buildObj(obj, fn, args, context, importFiles){
 
-    if(Array.isArray(context)) {
+    if(typeof(importFiles) == "undefined" && Array.isArray(context) &&
+      context.length && typeof(context[0]) == "string")
+    {
       // the 4-th argument exist, but it is Array, which means 
       // that this is a list of imported files.
       obj.imprt = context;
