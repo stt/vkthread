@@ -17,7 +17,14 @@
         if (typeof value != 'string') return value;
         if (value.length < 8) return value;
         if (iso8061 && value.match(iso8061)) return new Date(value);
-        if (value.substring(0, 8) === 'function') return eval('(' + value + ')');
+        if (value.substring(0, 8) === 'function') {
+          try {
+            return eval('(' + value + ')');
+          } catch(e) {
+            console.log(e);
+            return value;
+          }
+        }
         if (value.substring(0, 8) === '_PxEgEr_') return eval(value.slice(8));
         return value;
       });
@@ -32,12 +39,16 @@
     if(obj.imprt){
       importScripts.apply(null,obj.imprt);
     }
-    postMessage(obj.fn.apply(cntx,obj.args));
+
+    if(obj.fn.indexOf('[native code]') >= 0) {
+      var m = obj.fn.match(/^function ([^(]+)/);
+      if(m && m[1] in obj.cntx && typeof(obj.cntx[m[1]]) == "function") {
+        postMessage(obj.cntx[m[1]].apply(cntx,obj.args));
+      }
+
+    } else {
+      postMessage(obj.fn.apply(cntx,obj.args));
+    }
   };
 
 }());
-
-
-
-
-
